@@ -11,6 +11,13 @@ const client = new pg.Client({
 });
 
 const name = process.argv[2];
+function printResult(result) {
+  console.log(`Found 1 person(s) by the name '${name}'`);
+  console.log(
+    `- ${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0]
+      .last_name}, born  ${result.rows[0].birthdate}`
+  );
+}
 
 client.connect(err => {
   if (err) {
@@ -24,11 +31,7 @@ client.connect(err => {
       if (err) {
         return console.error("error running query", err);
       }
-      console.log(`Found 1 person(s) by the name '${name}'`);
-      console.log(
-        `- ${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0]
-          .last_name}, born  ${result.rows[0].birthdate}`
-      );
+      printResult(result);
       client.end();
     }
   );
