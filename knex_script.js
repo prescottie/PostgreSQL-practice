@@ -1,36 +1,42 @@
 const knex = require("knex")({
   client: "pg",
+  version: "7.2",
   connection: {
-    host: "localhost",
     user: "development",
     password: "development",
-    database: "vagrant"
+    database: "vagrant",
+    hostname: "localhost",
+    port: 5432,
+    ssl: true
   }
 });
 
 const name = process.argv[2];
-function printResult(result) {
-  console.log(`Found 1 person(s) by the name '${name}'`);
+
+function printPerson(person) {
   console.log(
-    `- ${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0]
-      .last_name}, born  ${result.rows[0].birthdate}`
+    `- ${person.id}: ${person.first_name} ${person.last_name}, born  ${person.birthdate}`
   );
 }
 
-knex.client.connect(err => {
-  if (err) {
-    return console.error("Connection Error", err);
-  }
+function printFindNameResults(result) {
+  console.log(`Found ${result.length} person(s) by the name '${name}':`);
+  result.forEach(printPerson);
+  process.exit();
+}
+
+function findPersonByName(done) {
   console.log("Searching...");
-  knex.client.query(
-    "SELECT id,first_name,last_name,to_char(birthdate,'YYYY/MM/DD') as birthdate FROM famous_people WHERE first_name LIKE $1::text OR last_name LIKE $1::text",
-    [name],
-    (err, result) => {
+  knex("famous_people")
+    .select("id", "first_name", "last_name", "birthdate")
+    .where("first_name", name)
+    .orWhere("last_name", name)
+    .asCallback((err, result) => {
       if (err) {
         return console.error("error running query", err);
       }
-      printResult(result);
-      knex.client.end();
-    }
-  );
-});
+      done(result);
+    });
+}
+
+findPersonByName(printFindNameResults);

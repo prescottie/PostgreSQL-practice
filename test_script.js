@@ -12,7 +12,7 @@ function printFindNameResults(result) {
   console.log(`Found ${result.rows.length} person(s) by the name '${name}':`);
   result.rows.forEach(printPerson);
 }
-function findFamousPeopleByName(done) {
+function findPersonByName(done) {
   db.connect((error, client) => {
     console.log("Searching ...");
     client.query(
@@ -28,4 +28,4 @@ function findFamousPeopleByName(done) {
     );
   });
 }
-findFamousPeopleByName(printFindNameResults);
+findPersonByName(printFindNameResults);
