@@ -1,38 +1,31 @@
 const pg = require("pg");
-const settings = require("./settings"); // settings.json
-
-const client = new pg.Client({
-  user: settings.user,
-  password: settings.password,
-  database: settings.database,
-  host: settings.hostname,
-  port: settings.port,
-  ssl: settings.ssl
-});
-
+const db = require("./db");
 const name = process.argv[2];
-function printResult(result) {
-  console.log(`Found 1 person(s) by the name '${name}'`);
+
+function printPerson(person) {
   console.log(
-    `- ${result.rows[0].id}: ${result.rows[0].first_name} ${result.rows[0]
-      .last_name}, born  ${result.rows[0].birthdate}`
+    `- ${person.id}: ${person.first_name} ${person.last_name}, born  ${person.birthdate}`
   );
 }
 
-client.connect(err => {
-  if (err) {
-    return console.error("Connection Error", err);
-  }
-  console.log("Searching...");
-  client.query(
-    "SELECT id,first_name,last_name,to_char(birthdate,'YYYY/MM/DD') as birthdate FROM famous_people WHERE first_name LIKE $1::text OR last_name LIKE $1::text",
-    [name],
-    (err, result) => {
-      if (err) {
-        return console.error("error running query", err);
+function printFindNameResults(result) {
+  console.log(`Found ${result.rows.length} person(s) by the name '${name}':`);
+  result.rows.forEach(printPerson);
+}
+function findFamousPeopleByName(done) {
+  db.connect((error, client) => {
+    console.log("Searching ...");
+    client.query(
+      "SELECT id,first_name,last_name,to_char(birthdate,'YYYY/MM/DD') as birthdate FROM famous_people WHERE first_name LIKE $1::text OR last_name LIKE $1::text",
+      [name],
+      (err, result) => {
+        if (err) {
+          return console.error("error running query", err);
+        }
+        done(result);
+        db.close(client);
       }
-      printResult(result);
-      client.end();
-    }
-  );
-});
+    );
+  });
+}
+findFamousPeopleByName(printFindNameResults);

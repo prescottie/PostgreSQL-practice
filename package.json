@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/prescottie/PostgreSQL-practice#readme",
   "dependencies": {
+    "knex": "^0.13.0",
     "pg": "^7.3.0"
   }
 }
