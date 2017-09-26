@@ -18,7 +18,7 @@ client.connect(err => {
   }
   console.log("Searching...");
   client.query(
-    "SELECT * FROM famous_people WHERE first_name LIKE $1::text OR last_name LIKE $1::text",
+    "SELECT id,first_name,last_name,to_char(birthdate,'YYYY/MM/DD') as birthdate FROM famous_people WHERE first_name LIKE $1::text OR last_name LIKE $1::text",
     [name],
     (err, result) => {
       if (err) {
