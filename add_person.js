@@ -1,15 +1,5 @@
-const knex = require("knex")({
-  client: "pg",
-  version: "7.2",
-  connection: {
-    user: "development",
-    password: "development",
-    database: "vagrant",
-    hostname: "localhost",
-    port: 5432,
-    ssl: true
-  }
-});
+const knexSettings = require("./knexsettings");
+const knex = require("knex")(knexSettings);
 
 const firstName = process.argv[2];
 const lastName = process.argv[3];
